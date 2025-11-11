@@ -56,4 +56,17 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Dependences for the App
+
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.9.4")
+
+    // Icons Compose
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // TODO:
+    // Coil Compose?, Importar Firebase BoM
+
+
 }
