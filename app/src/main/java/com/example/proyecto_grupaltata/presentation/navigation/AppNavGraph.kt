@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
+import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 
 @Composable
@@ -15,18 +16,12 @@ fun AppNavGraph(){
     NavHost(navController = navController,
         startDestination = "login"){    // La primera ruta donde comienza la app
 
-        // Es necesario?
-        //composable("register") { RegisterScreen(navController) }
         composable("login") { LoginScreen(navController)}
 
-        // DrawerScaffold, posiblemente se añada, pero deberia haber una forma de ponerlo para que este debajo
-        // en todo caso seria hacer un barra de navegacion
+        // The register_vacancy route is no longer a full screen, but a dialog.
+        // It will be called from VacanciesScreen.
 
-
-
+        composable("vacancies") { VacanciesScreen() }
 
     }
-
-    // ----------------------------------------------------------
-
 }
