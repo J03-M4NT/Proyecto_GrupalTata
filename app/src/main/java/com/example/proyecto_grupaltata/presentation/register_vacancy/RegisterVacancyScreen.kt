@@ -2,6 +2,7 @@ package com.example.proyecto_grupaltata.presentation.register_vacancy
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,12 +19,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.proyecto_grupaltata.domain.model.Vacancy
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterVacancyDialog(onDismissRequest: () -> Unit) {
+fun RegisterVacancyDialog(
+    onDismissRequest: () -> Unit,
+    onVacancyRegistered: (Vacancy) -> Unit
+) {
     var profileName by remember { mutableStateOf("") }
     var projectAccount by remember { mutableStateOf("") }
     var desiredLevel by remember { mutableStateOf("") }
@@ -60,7 +64,8 @@ fun RegisterVacancyDialog(onDismissRequest: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
-                Row(
+                // ... (Header and other fields remain the same)
+                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -113,7 +118,7 @@ fun RegisterVacancyDialog(onDismissRequest: () -> Unit) {
                 }
                 Spacer(Modifier.height(16.dp))
 
-                ExposedDropdownMenuBox(expanded = isLevelExpanded, onExpandedChange = { isLevelExpanded = !isLevelExpanded }) {
+                 ExposedDropdownMenuBox(expanded = isLevelExpanded, onExpandedChange = { isLevelExpanded = !isLevelExpanded }) {
                     OutlinedTextField(
                         value = desiredLevel,
                         onValueChange = {},
@@ -169,10 +174,32 @@ fun RegisterVacancyDialog(onDismissRequest: () -> Unit) {
                 }
                 Spacer(Modifier.height(24.dp))
 
+
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onDismissRequest) { Text("Cancelar") }
                     Spacer(Modifier.width(8.dp))
-                    Button(onClick = { onDismissRequest() }) { Text("Registrar Vacante") }
+                    Button(onClick = {
+                        val isFormValid = profileName.isNotBlank() &&
+                                        projectAccount.isNotBlank() &&
+                                        desiredLevel.isNotBlank() &&
+                                        startDate.isNotBlank() &&
+                                        urgency.isNotBlank() &&
+                                        selectedSkills.isNotEmpty()
+
+                        if (isFormValid) {
+                            val newVacancy = Vacancy(
+                                profileName = profileName,
+                                projectAccount = projectAccount,
+                                requiredSkills = selectedSkills.toList(),
+                                desiredLevel = desiredLevel,
+                                startDate = startDate,
+                                urgency = urgency
+                            )
+                            onVacancyRegistered(newVacancy)
+                        } else {
+                            Toast.makeText(context, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+                        }
+                    }) { Text("Registrar Vacante") }
                 }
             }
         }
