@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.proyecto_grupaltata" />
+                  <option name="mobileSdkAppId" value="1:681448506278:android:0df4fb3d1a4da4fa120567" />
+                  <option name="projectId" value="tata-firebase25" />
+                  <option name="projectNumber" value="681448506278" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
