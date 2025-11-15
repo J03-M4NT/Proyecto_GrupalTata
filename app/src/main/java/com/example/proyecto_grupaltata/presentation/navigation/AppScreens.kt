@@ -19,4 +19,7 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Vacantes
     object VacanciesScreen : AppScreens("vacancies_screen")
 
+    // Pantalla "Más"
+    object MoreScreen : AppScreens("more_screen")
+
 }

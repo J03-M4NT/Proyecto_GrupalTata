@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
 import com.example.proyecto_grupaltata.presentation.home.HomeScreen
+import com.example.proyecto_grupaltata.presentation.more.MoreScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 @Composable
@@ -26,6 +27,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
         composable(AppScreens.HomeScreen.route) { HomeScreen(navController) }
         
         composable(AppScreens.VacanciesScreen.route) { VacanciesScreen(navController) }
+
+        composable(AppScreens.MoreScreen.route) { MoreScreen(navController) }
         
         composable(
             route = "matching/{skills}",
