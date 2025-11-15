@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyecto_grupaltata.R
+import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
 import com.example.proyecto_grupaltata.ui.theme.BlueTCS
 import com.example.proyecto_grupaltata.ui.theme.OrangeTcs
 
@@ -118,8 +119,12 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate("vacancies") }) {
-            Text("Go to Vacancies Screen (Temp)")
+        Button(
+            onClick = { navController.navigate(AppScreens.HomeScreen.route) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = BlueTCS)
+        ) {
+            Text("Iniciar Sesión", style = MaterialTheme.typography.titleLarge)
         }
     }
 }

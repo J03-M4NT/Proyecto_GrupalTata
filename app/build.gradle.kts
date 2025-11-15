@@ -8,6 +8,7 @@ plugins {
     // Se añade Google services Gradle plugin
     id("com.google.gms.google-services")
 
+
 }
 
 android {
@@ -56,10 +57,19 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
-    // Firebase
+    // Dependencias adicionales de Jair
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
+    
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+
+    // Firebase (Parte del BoM)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
