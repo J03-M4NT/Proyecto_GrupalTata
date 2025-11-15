@@ -26,7 +26,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem("Mapping", "collaborators_route", Icons.Default.Person), // Placeholder
         BottomNavItem("Vacantes", AppScreens.VacanciesScreen.route, Icons.Default.Work),
         BottomNavItem("Brechas", "breach_route", Icons.AutoMirrored.Filled.TrendingUp), // Placeholder
-        BottomNavItem("Más", "settings_route", Icons.Default.Menu) // Placeholder
+        BottomNavItem("Más", AppScreens.MoreScreen.route, Icons.Default.Menu)
     )
 
     NavigationBar {
