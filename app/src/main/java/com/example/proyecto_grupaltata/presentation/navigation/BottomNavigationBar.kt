@@ -1,10 +1,13 @@
 package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,9 +23,10 @@ fun BottomNavigationBar(navController: NavController) {
 
     val items = listOf(
         BottomNavItem("Inicio", AppScreens.HomeScreen.route, Icons.Default.Home),
-        BottomNavItem("Vacantes", AppScreens.VacanciesScreen.route, Icons.Default.List),
-        BottomNavItem("Colaboradores", "collaborators_route", Icons.Default.Person), // Placeholder
-        BottomNavItem("Ajustes", "settings_route", Icons.Default.Settings) // Placeholder
+        BottomNavItem("Mapping", "collaborators_route", Icons.Default.Person), // Placeholder
+        BottomNavItem("Vacantes", AppScreens.VacanciesScreen.route, Icons.Default.Work),
+        BottomNavItem("Brechas", "breach_route", Icons.AutoMirrored.Filled.TrendingUp), // Placeholder
+        BottomNavItem("Más", "settings_route", Icons.Default.Menu) // Placeholder
     )
 
     NavigationBar {
