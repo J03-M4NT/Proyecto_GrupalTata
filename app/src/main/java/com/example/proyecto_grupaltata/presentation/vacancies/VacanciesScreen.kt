@@ -1,6 +1,7 @@
 package com.example.proyecto_grupaltata.presentation.vacancies
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,16 +18,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacanciesScreen(navController: NavHostController) {
+fun VacanciesScreen(
+    navController: NavController,
+    vacanciesViewModel: VacanciesViewModel = viewModel() // Get the ViewModel instance
+) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
-    val vacancies = remember { mutableStateListOf<Vacancy>() }
+    // Get the search query and the filtered list from the ViewModel
+    val searchQuery = vacanciesViewModel.searchQuery
+    val filteredVacancies = vacanciesViewModel.filteredVacancies
 
     Scaffold(
         topBar = {
@@ -52,8 +60,8 @@ fun VacanciesScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = searchQuery,
+                onValueChange = { vacanciesViewModel.onSearchQueryChange(it) }, // Update the query in the ViewModel
                 placeholder = { Text("Buscar vacante...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
                 modifier = Modifier.fillMaxWidth()
@@ -61,17 +69,21 @@ fun VacanciesScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (vacancies.isEmpty()) {
+            if (filteredVacancies.isEmpty()) {
                 Text(
-                    "Aún no hay vacantes registradas.",
+                    text = if (searchQuery.isBlank()) "Aún no hay vacantes registradas." else "No se encontraron vacantes.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray,
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(vacancies) { vacancy ->
-                        VacancyCard(vacancy = vacancy)
+                    // Display the filtered list
+                    items(filteredVacancies) { vacancy ->
+                        VacancyCard(vacancy = vacancy) {
+                            val skillsRoute = vacancy.requiredSkills.joinToString(",")
+                            navController.navigate("matching/$skillsRoute")
+                        }
                     }
                 }
             }
@@ -82,7 +94,7 @@ fun VacanciesScreen(navController: NavHostController) {
         RegisterVacancyDialog(
             onDismissRequest = { showRegisterDialog = false },
             onVacancyRegistered = { newVacancy ->
-                vacancies.add(newVacancy)
+                vacanciesViewModel.addVacancy(newVacancy)
                 showRegisterDialog = false
             }
         )
@@ -91,9 +103,9 @@ fun VacanciesScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacancyCard(vacancy: Vacancy) {
+fun VacancyCard(vacancy: Vacancy, onClick: () -> Unit) { // Added onClick lambda
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), // Made the whole card clickable
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

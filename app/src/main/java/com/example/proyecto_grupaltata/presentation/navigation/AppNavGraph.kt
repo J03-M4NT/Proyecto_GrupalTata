@@ -1,6 +1,10 @@
 package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -10,24 +14,30 @@ import com.example.proyecto_grupaltata.presentation.home.HomeScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 @Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
+fun AppNavGraph(){
+
+    val navController = rememberNavController()
+
     NavHost(
         navController = navController,
-        startDestination = AppScreens.LoginScreen.route,
-        modifier = modifier
-    ) {
-        composable(route = AppScreens.LoginScreen.route) {
-            LoginScreen(navController)
+        startDestination = AppScreens.Login.route){    // La primera ruta donde comienza la app
+
+        composable(AppScreens.Login.route) { LoginScreen(navController) }
+        
+        composable(AppScreens.Home.route) { HomeScreen(navController) }
+        
+        composable(AppScreens.Vacancies.route) { VacanciesScreen(navController) }
+        
+        composable(
+            route = "matching/{skills}",
+            arguments = listOf(navArgument("skills") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val skillsString = backStackEntry.arguments?.getString("skills") ?: ""
+            val skillsList = skillsString.split(",").filter { it.isNotEmpty() }
+            MatchingScreen(navController = navController, skills = skillsList)
         }
-        composable(route = AppScreens.HomeScreen.route) {
-            HomeScreen(navController)
-        }
-        composable(route = AppScreens.VacanciesScreen.route) {
-            VacanciesScreen(navController)
-        }
-        // Aquí irán las demás pantallas que agregues
+ 
+        // Demas pantallas
+        
     }
 }

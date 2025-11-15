@@ -82,10 +82,18 @@ dependencies {
     // Dependences for the App
 
     // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.9.4")
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
     // Icons Compose
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Retrofit for API calls
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    
+    // ViewModel Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+
 
     // TODO:
     // Coil Compose?, Importar Firebase BoM
