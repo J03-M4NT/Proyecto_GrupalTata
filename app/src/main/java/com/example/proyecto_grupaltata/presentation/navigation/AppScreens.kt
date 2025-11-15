@@ -5,7 +5,7 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Login
     object LoginScreen : AppScreens("login_screen")
 
-    // Pantalla Principal (Home) - ¡ESTA PROBABLEMENTE FALTABA!
+    // Pantalla Principal (Home) - ¡ESTA PROBABLEMENTE FALTABA!ss
     object HomeScreen : AppScreens("home_screen")
 
     // Pantalla para Añadir Colaborador - ¡ESTA PROBABLEMENTE FALTABA!
