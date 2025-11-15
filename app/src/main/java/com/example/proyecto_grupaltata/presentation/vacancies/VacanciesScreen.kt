@@ -18,16 +18,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacanciesScreen(navController: NavController) {
+fun VacanciesScreen(
+    navController: NavController,
+    vacanciesViewModel: VacanciesViewModel = viewModel() // Get the ViewModel instance
+) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
-    val vacancies = remember { mutableStateListOf<Vacancy>() }
+    // Get the search query and the filtered list from the ViewModel
+    val searchQuery = vacanciesViewModel.searchQuery
+    val filteredVacancies = vacanciesViewModel.filteredVacancies
 
     Scaffold(
         topBar = {
@@ -53,8 +59,8 @@ fun VacanciesScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = searchQuery,
+                onValueChange = { vacanciesViewModel.onSearchQueryChange(it) }, // Update the query in the ViewModel
                 placeholder = { Text("Buscar vacante...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
                 modifier = Modifier.fillMaxWidth()
@@ -62,18 +68,18 @@ fun VacanciesScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (vacancies.isEmpty()) {
+            if (filteredVacancies.isEmpty()) {
                 Text(
-                    "Aún no hay vacantes registradas.",
+                    text = if (searchQuery.isBlank()) "Aún no hay vacantes registradas." else "No se encontraron vacantes.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray,
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(vacancies) { vacancy ->
+                    // Display the filtered list
+                    items(filteredVacancies) { vacancy ->
                         VacancyCard(vacancy = vacancy) {
-                            // Navigate to matching screen when a card is clicked
                             val skillsRoute = vacancy.requiredSkills.joinToString(",")
                             navController.navigate("matching/$skillsRoute")
                         }
@@ -87,9 +93,8 @@ fun VacanciesScreen(navController: NavController) {
         RegisterVacancyDialog(
             onDismissRequest = { showRegisterDialog = false },
             onVacancyRegistered = { newVacancy ->
-                vacancies.add(newVacancy)
+                vacanciesViewModel.addVacancy(newVacancy)
                 showRegisterDialog = false
-                // Navigation is no longer here
             }
         )
     }
