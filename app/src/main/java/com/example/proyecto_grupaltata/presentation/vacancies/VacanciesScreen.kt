@@ -17,12 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacanciesScreen() {
+fun VacanciesScreen(navController: NavHostController) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
     val vacancies = remember { mutableStateListOf<Vacancy>() }
