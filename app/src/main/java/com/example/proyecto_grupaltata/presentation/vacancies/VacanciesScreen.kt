@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
@@ -32,9 +31,21 @@ fun VacanciesScreen(
 ) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
-    // Get the search query and the filtered list from the ViewModel
+    
+    // The UI now collects the full list and the query separately
     val searchQuery = vacanciesViewModel.searchQuery
-    val filteredVacancies = vacanciesViewModel.filteredVacancies
+    val allVacancies by vacanciesViewModel.vacancies.collectAsState()
+
+    // The filtering logic is now done in the Composable
+    val filteredVacancies = remember(allVacancies, searchQuery) {
+        if (searchQuery.isBlank()) {
+            allVacancies
+        } else {
+            allVacancies.filter {
+                it.profileName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -78,7 +89,6 @@ fun VacanciesScreen(
                 )
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Display the filtered list
                     items(filteredVacancies) { vacancy ->
                         VacancyCard(vacancy = vacancy) {
                             val skillsRoute = vacancy.requiredSkills.joinToString(",")
