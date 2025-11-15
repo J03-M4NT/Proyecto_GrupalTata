@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED")
+
 package com.example.proyecto_grupaltata.data.remote
 
 import com.example.proyecto_grupaltata.domain.model.Candidate

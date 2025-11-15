@@ -8,6 +8,7 @@ class MatchingRepository {
 
     // This function simulates a network call to the matching API.
     // We'll replace this with a real call to Retrofit later.
+    @Suppress("UNUSED_PARAMETER")
     suspend fun findMatches(skills: List<String>): List<Candidate> {
         // Simulate network delay
         delay(1500) 
