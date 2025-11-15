@@ -1,11 +1,11 @@
 package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,19 +14,18 @@ import com.example.proyecto_grupaltata.presentation.home.HomeScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 @Composable
-fun AppNavGraph(){
+fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
 
-    val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = AppScreens.Login.route){    // La primera ruta donde comienza la app
+        startDestination = AppScreens.LoginScreen.route){    // La primera ruta donde comienza la app
 
-        composable(AppScreens.Login.route) { LoginScreen(navController) }
+        composable(AppScreens.LoginScreen.route) { LoginScreen(navController) }
         
-        composable(AppScreens.Home.route) { HomeScreen(navController) }
+        composable(AppScreens.HomeScreen.route) { HomeScreen(navController) }
         
-        composable(AppScreens.Vacancies.route) { VacanciesScreen(navController) }
+        composable(AppScreens.VacanciesScreen.route) { VacanciesScreen(navController) }
         
         composable(
             route = "matching/{skills}",
