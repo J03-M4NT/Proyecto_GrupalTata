@@ -5,23 +5,31 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
-import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
-
+// IMPORTS AÑADIDOS
+import com.example.proyecto_grupaltata.presentation.colaborador.AddColaboradorScreen
+import com.example.proyecto_grupaltata.presentation.home.HomeScreen
 
 @Composable
-fun AppNavGraph(){
-
+fun AppNavGraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController,
-        startDestination = "login"){    // La primera ruta donde comienza la app
+    NavHost(
+        navController = navController,
+        startDestination = AppScreens.LoginScreen.route
+    ) {
+        // Ruta para la pantalla de Login
+        composable(route = AppScreens.LoginScreen.route) {
+            LoginScreen(navController)
+        }
 
-        composable("login") { LoginScreen(navController)}
+        // Ruta para la pantalla Principal (Home) - ¡AHORA SÍ LA ENCUENTRA!
+        composable(route = AppScreens.HomeScreen.route) {
+            HomeScreen(navController)
+        }
 
-        // The register_vacancy route is no longer a full screen, but a dialog.
-        // It will be called from VacanciesScreen.
-
-        composable("vacancies") { VacanciesScreen() }
-
+        // Ruta para añadir colaborador - ¡AHORA SÍ LA ENCUENTRA!
+        composable(route = AppScreens.AddColaboradorScreen.route) {
+            AddColaboradorScreen(navController)
+        }
     }
 }
