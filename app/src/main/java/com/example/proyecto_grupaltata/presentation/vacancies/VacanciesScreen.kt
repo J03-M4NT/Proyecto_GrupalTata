@@ -1,6 +1,7 @@
 package com.example.proyecto_grupaltata.presentation.vacancies
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,12 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.proyecto_grupaltata.domain.model.Vacancy
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacanciesScreen() {
+fun VacanciesScreen(navController: NavController) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
     val vacancies = remember { mutableStateListOf<Vacancy>() }
@@ -70,7 +72,11 @@ fun VacanciesScreen() {
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(vacancies) { vacancy ->
-                        VacancyCard(vacancy = vacancy)
+                        VacancyCard(vacancy = vacancy) {
+                            // Navigate to matching screen when a card is clicked
+                            val skillsRoute = vacancy.requiredSkills.joinToString(",")
+                            navController.navigate("matching/$skillsRoute")
+                        }
                     }
                 }
             }
@@ -83,6 +89,7 @@ fun VacanciesScreen() {
             onVacancyRegistered = { newVacancy ->
                 vacancies.add(newVacancy)
                 showRegisterDialog = false
+                // Navigation is no longer here
             }
         )
     }
@@ -90,9 +97,9 @@ fun VacanciesScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacancyCard(vacancy: Vacancy) {
+fun VacancyCard(vacancy: Vacancy, onClick: () -> Unit) { // Added onClick lambda
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), // Made the whole card clickable
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

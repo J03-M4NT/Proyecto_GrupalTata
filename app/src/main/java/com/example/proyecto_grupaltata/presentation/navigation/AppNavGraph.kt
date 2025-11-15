@@ -1,10 +1,13 @@
 package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
+import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 
@@ -18,10 +21,16 @@ fun AppNavGraph(){
 
         composable("login") { LoginScreen(navController)}
 
-        // The register_vacancy route is no longer a full screen, but a dialog.
-        // It will be called from VacanciesScreen.
+        composable("vacancies") { VacanciesScreen(navController) } // Pass NavController
 
-        composable("vacancies") { VacanciesScreen() }
+        composable(
+            route = "matching/{skills}",
+            arguments = listOf(navArgument("skills") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val skillsString = backStackEntry.arguments?.getString("skills") ?: ""
+            val skillsList = skillsString.split(",").filter { it.isNotEmpty() }
+            MatchingScreen(navController = navController, skills = skillsList)
+        }
 
     }
 }
