@@ -1,12 +1,12 @@
 package com.example.proyecto_grupaltata.domain.model
 
+// Add the no-arg constructor and default values for Firestore deserialization
 data class Vacancy(
-    val profileName: String,
-    val projectAccount: String,
-    val requiredSkills: List<String>,
-    val desiredLevel: String,
-    val startDate: String,
-    val urgency: String,
-    // We can add more fields later, like a unique ID
-    val id: String = java.util.UUID.randomUUID().toString() 
+    var profileName: String = "",
+    var projectAccount: String = "",
+    var requiredSkills: List<String> = emptyList(),
+    var desiredLevel: String = "",
+    var startDate: String = "",
+    var urgency: String = "",
+    var id: String = ""
 )

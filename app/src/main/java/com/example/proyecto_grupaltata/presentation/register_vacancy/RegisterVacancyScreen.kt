@@ -45,16 +45,15 @@ fun RegisterVacancyDialog(
     var isUrgencyExpanded by remember { mutableStateOf(false) }
     val urgencyOptions = listOf("Baja", "Media", "Alta")
 
-    val calendar = Calendar.getInstance()
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             startDate = sdf.format(GregorianCalendar(year, month, dayOfMonth).time)
         },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
+        Calendar.getInstance().get(Calendar.YEAR),
+        Calendar.getInstance().get(Calendar.MONTH),
+        Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
     )
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -64,8 +63,7 @@ fun RegisterVacancyDialog(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
-                // ... (Header and other fields remain the same)
-                 Row(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -188,6 +186,7 @@ fun RegisterVacancyDialog(
 
                         if (isFormValid) {
                             val newVacancy = Vacancy(
+                                id = UUID.randomUUID().toString(),
                                 profileName = profileName,
                                 projectAccount = projectAccount,
                                 requiredSkills = selectedSkills.toList(),
