@@ -19,6 +19,9 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Vacantes
     object VacanciesScreen : AppScreens("vacancies_screen")
 
+    // Pantalla de Matching (Skill Mapping)
+    object MatchingScreen : AppScreens("matching_screen")
+
     // Pantalla "Más"
     object MoreScreen : AppScreens("more_screen")
 

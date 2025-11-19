@@ -23,7 +23,7 @@ fun BottomNavigationBar(navController: NavController) {
 
     val items = listOf(
         BottomNavItem("Inicio", AppScreens.HomeScreen.route, Icons.Default.Home),
-        BottomNavItem("Mapping", "collaborators_route", Icons.Default.Person), // Placeholder
+        BottomNavItem("Mapping", AppScreens.MatchingScreen.route, Icons.Default.Person), // ¡CORREGIDO!
         BottomNavItem("Vacantes", AppScreens.VacanciesScreen.route, Icons.Default.Work),
         BottomNavItem("Brechas", "breach_route", Icons.AutoMirrored.Filled.TrendingUp), // Placeholder
         BottomNavItem("Más", AppScreens.MoreScreen.route, Icons.Default.Menu)

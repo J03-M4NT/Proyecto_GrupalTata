@@ -2,9 +2,7 @@ package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -29,15 +27,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
         composable(AppScreens.VacanciesScreen.route) { VacanciesScreen(navController) }
 
         composable(AppScreens.MoreScreen.route) { MoreScreen(navController) }
-        
-        composable(
-            route = "matching/{skills}",
-            arguments = listOf(navArgument("skills") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val skillsString = backStackEntry.arguments?.getString("skills") ?: ""
-            val skillsList = skillsString.split(",").filter { it.isNotEmpty() }
-            MatchingScreen(navController = navController, skills = skillsList)
-        }
+
+        composable(AppScreens.MatchingScreen.route) { MatchingScreen(navController) }
  
         // Demas pantallas
         

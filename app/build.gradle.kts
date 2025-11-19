@@ -56,16 +56,13 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-
-    // Dependencias adicionales de Jair
-    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
 
-    // Firebase (Parte del BoM)
+    // Firebase (Parte del BoM) - ¡CORREGIDO!
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
@@ -96,7 +93,7 @@ dependencies {
 
 
     // TODO:
-    // Coil Compose?, Importar Firebase BoM
+    // Coil Compose
 
 
 }
