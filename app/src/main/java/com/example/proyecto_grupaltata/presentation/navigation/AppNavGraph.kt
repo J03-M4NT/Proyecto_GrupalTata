@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
+import com.example.proyecto_grupaltata.presentation.brechas.BrechasScreen
 import com.example.proyecto_grupaltata.presentation.home.HomeScreen
 import com.example.proyecto_grupaltata.presentation.more.MoreScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
@@ -29,6 +30,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
         composable(AppScreens.MoreScreen.route) { MoreScreen(navController) }
 
         composable(AppScreens.MatchingScreen.route) { MatchingScreen(navController) }
+
+        composable(AppScreens.BrechasScreen.route) { BrechasScreen() }
  
         // Demas pantallas
         

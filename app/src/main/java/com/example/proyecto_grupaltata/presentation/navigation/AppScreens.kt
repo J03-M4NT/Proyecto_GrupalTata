@@ -25,4 +25,7 @@ sealed class AppScreens(val route: String) {
     // Pantalla "Más"
     object MoreScreen : AppScreens("more_screen")
 
+    // Pantalla de Brechas
+    object BrechasScreen : AppScreens("brechas_screen")
+
 }
