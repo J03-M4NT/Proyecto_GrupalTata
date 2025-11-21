@@ -25,7 +25,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem("Inicio", AppScreens.HomeScreen.route, Icons.Default.Home),
         BottomNavItem("Mapping", AppScreens.MatchingScreen.route, Icons.Default.Person), // ¡CORREGIDO!
         BottomNavItem("Vacantes", AppScreens.VacanciesScreen.route, Icons.Default.Work),
-        BottomNavItem("Brechas", "breach_route", Icons.AutoMirrored.Filled.TrendingUp), // Placeholder
+        BottomNavItem("Brechas", AppScreens.BrechasScreen.route, Icons.AutoMirrored.Filled.TrendingUp),
         BottomNavItem("Más", AppScreens.MoreScreen.route, Icons.Default.Menu)
     )
 
