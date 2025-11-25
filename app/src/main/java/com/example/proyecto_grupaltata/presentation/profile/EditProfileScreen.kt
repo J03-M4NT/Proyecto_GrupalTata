@@ -34,15 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyecto_grupaltata.domain.model.Collaborator
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(navController: NavController) {
+// **CORRECCIÓN 1: Recibir el userId como parámetro**
+fun EditProfileScreen(navController: NavController, userId: String) {
 
     var nombre by remember { mutableStateOf("") }
     var rol by remember { mutableStateOf("") }
@@ -55,28 +54,16 @@ fun EditProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
 
-    // **CORRECCIÓN APLICADA AQUI**
-    // La lógica de obtener el usuario y sus datos ahora está encapsulada en un único LaunchedEffect.
-    LaunchedEffect(key1 = Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        if (userId == null) {
-            Toast.makeText(context, "Error de autenticación. Intente de nuevo.", Toast.LENGTH_LONG).show()
-            navController.popBackStack()
-            return@LaunchedEffect
-        }
-
+    // **CORRECCIÓN 2: Usar el userId recibido directamente**
+    LaunchedEffect(key1 = userId) {
         FirebaseFirestore.getInstance().collection("collaborators").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    val existingCollaborator = document.toObject(Collaborator::class.java)
-                    existingCollaborator?.let {
-                        nombre = it.nombre
-                        rol = it.rol
-                        nivel = it.nivel
-                        project = it.project
-                        isNewProfile = false
-                    }
+                    nombre = document.getString("nombre") ?: ""
+                    rol = document.getString("rol") ?: ""
+                    nivel = document.getString("nivel") ?: ""
+                    project = document.getString("project") ?: ""
+                    isNewProfile = false
                 } else {
                     isNewProfile = true
                 }
@@ -106,11 +93,7 @@ fun EditProfileScreen(navController: NavController) {
             }
         } else {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre Completo") }, modifier = Modifier.fillMaxWidth())
@@ -121,20 +104,11 @@ fun EditProfileScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = {
-                        val userId = FirebaseAuth.getInstance().currentUser?.uid
-                        if (userId != null) {
-                            handleSaveProfile(userId, nombre, rol, nivel, project, context, navController) { isSaving = it }
-                        }
-                    },
+                    onClick = { handleSaveProfile(userId, nombre, rol, nivel, project, context, navController) { isSaving = it } },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !isSaving
                 ) {
-                    if (isSaving) {
-                        CircularProgressIndicator()
-                    } else {
-                        Text("Guardar Cambios")
-                    }
+                    if (isSaving) { CircularProgressIndicator() } else { Text("Guardar Cambios") }
                 }
             }
         }
@@ -142,22 +116,14 @@ fun EditProfileScreen(navController: NavController) {
 }
 
 private fun handleSaveProfile(
-    userId: String,
-    nombre: String,
-    rol: String,
-    nivel: String,
-    project: String,
-    context: android.content.Context,
-    navController: NavController,
-    onSavingStateChange: (Boolean) -> Unit
+    userId: String, nombre: String, rol: String, nivel: String, project: String,
+    context: android.content.Context, navController: NavController, onSavingStateChange: (Boolean) -> Unit
 ) {
     if (nombre.isBlank() || rol.isBlank() || nivel.isBlank()) {
         Toast.makeText(context, "Por favor, complete todos los campos.", Toast.LENGTH_LONG).show()
         return
     }
-
     onSavingStateChange(true)
-
     val profileData = hashMapOf(
         "userId" to userId,
         "nombre" to nombre,
@@ -166,7 +132,6 @@ private fun handleSaveProfile(
         "project" to project,
         "fechaActualizacion" to FieldValue.serverTimestamp()
     )
-
     FirebaseFirestore.getInstance().collection("collaborators").document(userId)
         .set(profileData, SetOptions.merge())
         .addOnSuccessListener {

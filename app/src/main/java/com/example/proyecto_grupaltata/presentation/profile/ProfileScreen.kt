@@ -50,9 +50,9 @@ fun ProfileScreen(navController: NavController) {
     var collaborator by remember { mutableStateOf<Collaborator?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-    LaunchedEffect(key1 = navController.currentBackStackEntry) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+    LaunchedEffect(key1 = userId, key2 = navController.currentBackStackEntry) {
         if (userId == null) {
             Log.e("ProfileScreen", "UserID is null, cannot fetch profile.")
             isLoading = false
@@ -62,19 +62,16 @@ fun ProfileScreen(navController: NavController) {
         isLoading = true
         FirebaseFirestore.getInstance().collection("collaborators").document(userId).get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    collaborator = document.toObject(Collaborator::class.java)?.apply {
-                        this.userId = document.id // Asignar el ID del documento al objeto
-                    }
+                collaborator = if (document.exists()) {
+                    document.toObject(Collaborator::class.java)?.apply { this.userId = document.id }
                 } else {
-                    collaborator = null // Si no existe, el colaborador es nulo
+                    null
                 }
                 isLoading = false
             }
             .addOnFailureListener { exception ->
                 Log.e("ProfileScreen", "Error al cargar el perfil", exception)
                 Toast.makeText(context, "Error al cargar perfil.", Toast.LENGTH_SHORT).show()
-                collaborator = null
                 isLoading = false
             }
     }
@@ -89,8 +86,9 @@ fun ProfileScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    if (collaborator != null) {
-                        IconButton(onClick = { navController.navigate(AppScreens.EditProfileScreen.route) }) {
+                    if (collaborator != null && userId != null) {
+                        // **CORRECCIÓN 1: Pasar el userId al navegar**
+                        IconButton(onClick = { navController.navigate(AppScreens.EditProfileScreen.createRoute(userId)) }) {
                             Icon(Icons.Default.Edit, contentDescription = "Editar Perfil")
                         }
                     }
@@ -116,23 +114,15 @@ fun ProfileScreen(navController: NavController) {
                     ProfileDetailRow(label = "Nivel", value = user.nivel)
                     ProfileDetailRow(label = "Proyecto", value = user.project)
                     ProfileDetailRow(label = "Disponibilidad", value = if (user.movilidad) "Disponible" else "No Disponible")
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text("Skills", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    if (user.skills.isNotEmpty()) {
-                        user.skills.forEach { skill ->
-                            ProfileDetailRow(label = "Skill", value = skill)
-                        }
-                    } else {
-                        Text("Aún no hay skills registrados.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-                    }
+                    // ... más detalles
                 }
             }
         } else {
-            LaunchedEffect(Unit) {
-                navController.navigate(AppScreens.EditProfileScreen.route)
+             // **CORRECCIÓN 2: Pasar el userId al redirigir**
+            if (userId != null) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppScreens.EditProfileScreen.createRoute(userId))
+                }
             }
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()

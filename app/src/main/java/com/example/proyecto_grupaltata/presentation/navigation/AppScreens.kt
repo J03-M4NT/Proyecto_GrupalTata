@@ -34,7 +34,10 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Perfil de Usuario
     object ProfileScreen : AppScreens("profile_screen")
 
-    // Pantalla para Editar el Perfil de Usuario
-    object EditProfileScreen : AppScreens("edit_profile_screen")
+    // Pantalla para Editar el Perfil de Usuario. Acepta el ID de usuario como argumento.
+    object EditProfileScreen : AppScreens("edit_profile_screen/{userId}") {
+        // Función para construir la ruta completa con el ID de usuario.
+        fun createRoute(userId: String) = "edit_profile_screen/$userId"
+    }
 
 }
