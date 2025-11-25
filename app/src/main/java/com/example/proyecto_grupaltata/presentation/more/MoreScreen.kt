@@ -1,3 +1,4 @@
+
 package com.example.proyecto_grupaltata.presentation.more
 
 import androidx.compose.foundation.BorderStroke
@@ -50,6 +51,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto_grupaltata.R
 import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +120,7 @@ fun MoreScreen(navController: NavController) {
                 iconColor = Color(0xFF6f42c1),
                 tagColor = Color(0xFF6f42c1),
                 cardColor = Color.White,
-                onClick = { navController.navigate(AppScreens.ReportActivityScreen.route) } // Navegación añadida
+                onClick = { navController.navigate(AppScreens.ReportActivityScreen.route) }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -139,7 +141,12 @@ fun MoreScreen(navController: NavController) {
                 subtitle = "Salir de forma segura",
                 iconColor = Color.Red,
                 cardColor = Color(0xFFFFF0F0),
-                onClick = { /* TODO: Handle Logout */ }
+                onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate(AppScreens.LoginScreen.route) {
+                        popUpTo(0)
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.weight(1f, fill = false))
