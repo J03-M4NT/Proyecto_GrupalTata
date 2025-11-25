@@ -27,5 +27,8 @@ sealed class AppScreens(val route: String) {
 
     // Pantalla de Brechas
     object BrechasScreen : AppScreens("brechas_screen")
+    
+    // Pantalla de Reportes de Actividad
+    object ReportActivityScreen : AppScreens("report_activity_screen")
 
 }
