@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto_grupaltata.R
+import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +117,8 @@ fun MoreScreen(navController: NavController) {
                 tag = "HR",
                 iconColor = Color(0xFF6f42c1),
                 tagColor = Color(0xFF6f42c1),
-                cardColor = Color.White
+                cardColor = Color.White,
+                onClick = { navController.navigate(AppScreens.ReportActivityScreen.route) } // Navegación añadida
             )
 
             Spacer(modifier = Modifier.height(24.dp))

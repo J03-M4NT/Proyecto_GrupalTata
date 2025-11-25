@@ -11,6 +11,7 @@ import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
 import com.example.proyecto_grupaltata.presentation.brechas.BrechasScreen
 import com.example.proyecto_grupaltata.presentation.home.HomeScreen
 import com.example.proyecto_grupaltata.presentation.more.MoreScreen
+import com.example.proyecto_grupaltata.presentation.report_activity.ReportActivityScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 @Composable
@@ -32,6 +33,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
         composable(AppScreens.MatchingScreen.route) { MatchingScreen(navController) }
 
         composable(AppScreens.BrechasScreen.route) { BrechasScreen() }
+
+        composable(AppScreens.ReportActivityScreen.route) { ReportActivityScreen(navController) }
  
         // Demas pantallas
         
