@@ -1,4 +1,3 @@
-// Forzando la reescritura del archivo
 package com.example.proyecto_grupaltata.presentation.mapping
 
 import android.util.Log
@@ -12,11 +11,11 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-// Estado de la UI para manejar Carga, Éxito y Error
 sealed interface MappingUiState {
     object Loading : MappingUiState
     object Success : MappingUiState
@@ -25,26 +24,24 @@ sealed interface MappingUiState {
 
 class MappingViewModel : ViewModel() {
 
-    // --- Estados del ViewModel ---
     private val _uiState = mutableStateOf<MappingUiState>(MappingUiState.Loading)
     val uiState: State<MappingUiState> = _uiState
 
-    // Flujo para el texto de búsqueda
     private val _searchText = MutableStateFlow("")
-    val searchText: StateFlow<String> = _searchText
+    val searchText: StateFlow<String> = _searchText.asStateFlow()
 
-    // Flujo para la lista original de colaboradores desde Firebase
     private val _collaborators = MutableStateFlow<List<Colaborador>>(emptyList())
+    
+    // --- NUEVO: Estado para el diálogo ---
+    private val _selectedCollaborator = MutableStateFlow<Colaborador?>(null)
+    val selectedCollaborator: StateFlow<Colaborador?> = _selectedCollaborator.asStateFlow()
 
-    // Flujo combinado que filtra los colaboradores según el texto de búsqueda
     val filteredCollaborators = searchText
         .combine(_collaborators) { text, collaborators ->
             if (text.isBlank()) {
                 collaborators
             } else {
-                collaborators.filter {
-                    it.nombre.contains(text, ignoreCase = true)
-                }
+                collaborators.filter { it.nombre.contains(text, ignoreCase = true) }
             }
         }
 
@@ -55,8 +52,16 @@ class MappingViewModel : ViewModel() {
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
+    
+    // --- NUEVAS FUNCIONES para manejar el diálogo ---
+    fun onCollaboratorSelected(collaborator: Colaborador) {
+        _selectedCollaborator.value = collaborator
+    }
 
-    // --- FUNCIÓN CORREGIDA Y ROBUSTA ---
+    fun onDialogDismiss() {
+        _selectedCollaborator.value = null
+    }
+
     private fun fetchCollaborators() {
         viewModelScope.launch {
             _uiState.value = MappingUiState.Loading
@@ -64,17 +69,13 @@ class MappingViewModel : ViewModel() {
                 val snapshot = Firebase.firestore.collection("collaborators").get().await()
                 val collaboratorsList = mutableListOf<Colaborador>()
 
-                // Recorremos los documentos uno por uno para evitar crashes por datos inconsistentes
                 for (document in snapshot.documents) {
                     try {
-                        // Intentamos convertir el documento a un objeto Colaborador
                         val collaborator = document.toObject<Colaborador>()
                         if (collaborator != null) {
-                            // Si la conversión es exitosa, le asignamos el ID del documento y lo añadimos a la lista
                             collaboratorsList.add(collaborator.copy(id = document.id))
                         }
                     } catch (e: Exception) {
-                        // Si un documento específico falla, lo ignoramos y registramos el error
                         Log.e("MappingViewModel", "Error al convertir el documento ${document.id}", e)
                     }
                 }

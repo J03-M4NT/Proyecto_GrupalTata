@@ -7,8 +7,6 @@ plugins {
 
     // Se añade Google services Gradle plugin
     id("com.google.gms.google-services")
-
-
 }
 
 android {
@@ -62,8 +60,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
 
-    // Firebase (Parte del BoM) - ¡CORREGIDO!
-    implementation(platform(libs.firebase.bom))
+    // Firebase (Parte del BoM) - ¡CORREGIDO A LA VERSIÓN ESTABLE!
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
@@ -78,22 +76,21 @@ dependencies {
 
     // Dependences for the App
 
-    // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.9.6")
+    // Navigation Compose - ¡CORREGIDO A LA VERSIÓN ESTABLE!
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Icons Compose
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Retrofit for API calls
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    // Retrofit for API calls - ¡CORREGIDO A LA VERSIÓN ESTABLE!
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     
-    // ViewModel Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+    // ViewModel Compose - ¡CORREGIDO A LA VERSIÓN ESTABLE!
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
 
 
     // TODO:
     // Coil Compose
-
 
 }
