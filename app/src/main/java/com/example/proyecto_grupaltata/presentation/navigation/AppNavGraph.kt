@@ -2,15 +2,16 @@ package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
-import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
 import com.example.proyecto_grupaltata.presentation.brechas.BrechasScreen
 import com.example.proyecto_grupaltata.presentation.home.HomeScreen
+import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import com.example.proyecto_grupaltata.presentation.more.MoreScreen
+import com.example.proyecto_grupaltata.presentation.profile.EditProfileScreen
+import com.example.proyecto_grupaltata.presentation.profile.ProfileScreen
 import com.example.proyecto_grupaltata.presentation.report_activity.ReportActivityScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
@@ -36,7 +37,10 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
 
         composable(AppScreens.ReportActivityScreen.route) { ReportActivityScreen(navController) }
  
-        // Demas pantallas
-        
+        // Pantallas de Perfil
+        composable(AppScreens.ProfileScreen.route) { ProfileScreen(navController) }
+
+        composable(AppScreens.EditProfileScreen.route) { EditProfileScreen(navController) }
+
     }
 }

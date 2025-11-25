@@ -132,7 +132,8 @@ fun MoreScreen(navController: NavController) {
                 title = "Mi Perfil",
                 subtitle = "Ver y editar información personal",
                 iconColor = Color(0xFF0d6efd),
-                cardColor = Color.White
+                cardColor = Color.White,
+                onClick = { navController.navigate(AppScreens.ProfileScreen.route) } // <-- AQUÍ EL CAMBIO
             )
             Spacer(modifier = Modifier.height(12.dp))
             ActionCard(

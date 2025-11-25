@@ -31,4 +31,10 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Reportes de Actividad
     object ReportActivityScreen : AppScreens("report_activity_screen")
 
+    // Pantalla de Perfil de Usuario
+    object ProfileScreen : AppScreens("profile_screen")
+
+    // Pantalla para Editar el Perfil de Usuario
+    object EditProfileScreen : AppScreens("edit_profile_screen")
+
 }
