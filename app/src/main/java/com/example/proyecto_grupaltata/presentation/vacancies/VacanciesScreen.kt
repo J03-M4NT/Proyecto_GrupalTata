@@ -18,32 +18,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.proyecto_grupaltata.model.Colaborador
 import com.example.proyecto_grupaltata.domain.model.Vacancy
+import com.example.proyecto_grupaltata.presentation.mapping.MappingViewModel
 import com.example.proyecto_grupaltata.presentation.register_vacancy.RegisterVacancyDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VacanciesScreen(
     navController: NavController,
-    vacanciesViewModel: VacanciesViewModel = viewModel() // Get the ViewModel instance
+    vacanciesViewModel: VacanciesViewModel = viewModel(),
+    mappingViewModel: MappingViewModel = viewModel() // Shared ViewModel
 ) {
 
     var showRegisterDialog by remember { mutableStateOf(false) }
-    
-    // The UI now collects the full list and the query separately
+    var selectedVacancy by remember { mutableStateOf<Vacancy?>(null) }
+
     val searchQuery = vacanciesViewModel.searchQuery
     val allVacancies by vacanciesViewModel.vacancies.collectAsState()
+    val collaborators by mappingViewModel.filteredCollaborators.collectAsState(initial = emptyList())
 
-    // The filtering logic is now done in the Composable
     val filteredVacancies = remember(allVacancies, searchQuery) {
-        if (searchQuery.isBlank()) {
-            allVacancies
-        } else {
-            allVacancies.filter {
-                it.profileName.contains(searchQuery, ignoreCase = true)
-            }
+        if (searchQuery.isBlank()) allVacancies else allVacancies.filter {
+            it.profileName.contains(searchQuery, ignoreCase = true)
         }
     }
 
@@ -60,19 +60,15 @@ fun VacanciesScreen(
         }
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
             Text("Vacantes y candidatos internos", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { vacanciesViewModel.onSearchQueryChange(it) }, // Update the query in the ViewModel
+                onValueChange = { vacanciesViewModel.onSearchQueryChange(it) },
                 placeholder = { Text("Buscar vacante...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
                 modifier = Modifier.fillMaxWidth()
@@ -90,10 +86,11 @@ fun VacanciesScreen(
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filteredVacancies) { vacancy ->
-                        VacancyCard(vacancy = vacancy) {
-                            val skillsRoute = vacancy.requiredSkills.joinToString(",")
-                            navController.navigate("matching/$skillsRoute")
-                        }
+                        VacancyCard(
+                            vacancy = vacancy,
+                            collaborators = collaborators, // Pass the list of collaborators
+                            onClick = { selectedVacancy = vacancy }
+                        )
                     }
                 }
             }
@@ -109,13 +106,65 @@ fun VacanciesScreen(
             }
         )
     }
+
+    selectedVacancy?.let {
+        vacancy ->
+        MatchDialog(
+            vacancy = vacancy,
+            collaborators = collaborators,
+            onDismiss = { selectedVacancy = null }
+        )
+    }
+}
+
+@Composable
+private fun MatchDialog(vacancy: Vacancy, collaborators: List<Colaborador>, onDismiss: () -> Unit) {
+    val matchingCollaborators = remember(vacancy, collaborators) {
+        if (vacancy.requiredSkills.isEmpty()) emptyList() else collaborators.filter {
+            collaborator ->
+            val userSkills = collaborator.technicalSkills.map { it.name } + collaborator.softSkills.map { it.name }
+            vacancy.requiredSkills.any { requiredSkill -> userSkills.any { it.equals(requiredSkill, ignoreCase = true) } }
+        }
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier.padding(24.dp).fillMaxWidth()) {
+                Text(text = "Match para: ${vacancy.profileName}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (matchingCollaborators.isEmpty()) {
+                    Text("No se encontraron colaboradores para esta vacante.")
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(matchingCollaborators) { collaborator ->
+                            Text(collaborator.nombre, style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
+                    Text("Cerrar")
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VacancyCard(vacancy: Vacancy, onClick: () -> Unit) { // Added onClick lambda
+fun VacancyCard(vacancy: Vacancy, collaborators: List<Colaborador>, onClick: () -> Unit) {
+    val matchingCollaboratorsCount = remember(vacancy, collaborators) {
+        if (vacancy.requiredSkills.isEmpty()) 0 else collaborators.count {
+            collaborator ->
+            val userSkills = collaborator.technicalSkills.map { it.name } + collaborator.softSkills.map { it.name }
+            vacancy.requiredSkills.any { requiredSkill -> userSkills.any { it.equals(requiredSkill, ignoreCase = true) } }
+        }
+    }
+
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), // Made the whole card clickable
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -124,13 +173,10 @@ fun VacancyCard(vacancy: Vacancy, onClick: () -> Unit) { // Added onClick lambda
                     text = vacancy.profileName,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
-                // Placeholder for status
                 Text(
                     text = "Abierta", 
                     color = Color.White,
-                    modifier = Modifier
-                        .background(Color(0xFF4CAF50), RoundedCornerShape(50))
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                    modifier = Modifier.background(Color(0xFF4CAF50), RoundedCornerShape(50)).padding(horizontal = 12.dp, vertical = 4.dp)
                 )
             }
             Text(text = "IT", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
@@ -146,7 +192,11 @@ fun VacancyCard(vacancy: Vacancy, onClick: () -> Unit) { // Added onClick lambda
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.People, contentDescription = "Candidatos", tint = Color.Gray)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "0 candidatos", color = Color.Gray, fontSize = 14.sp)
+                Text(
+                    text = "$matchingCollaboratorsCount candidatos",
+                    color = Color.Gray, 
+                    fontSize = 14.sp
+                )
             }
         }
     }
