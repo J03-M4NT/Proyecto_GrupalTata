@@ -1,5 +1,6 @@
 package com.example.proyecto_grupaltata.presentation.brechas
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +30,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +49,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.math.ceil
 
 // Data class to hold the details for each skill gap
 data class SkillGapDetail(
@@ -205,15 +211,18 @@ fun BrechasScreen(viewModel: BrechasViewModel = viewModel()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Brechas por Skill", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(16.dp))
-                    // Placeholder for the bar chart
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .background(Color.LightGray.copy(alpha = 0.5f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Bar Chart Placeholder")
+                    if (skillGapDetails.isNotEmpty()) {
+                        SkillBarChart(skillGapDetails = skillGapDetails.take(5)) // Show top 5 gaps
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .background(Color.LightGray.copy(alpha = 0.5f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No data available for chart")
+                        }
                     }
                 }
             }
@@ -263,6 +272,92 @@ fun BrechasScreen(viewModel: BrechasViewModel = viewModel()) {
         }
     }
 }
+
+@Composable
+fun SkillBarChart(skillGapDetails: List<SkillGapDetail>) {
+    val dataMaxValue = skillGapDetails.maxOfOrNull { it.gap } ?: 0
+    val chartColor = Color(0xFFF44336) // Red color for bars
+
+    if (dataMaxValue == 0) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No gap data to display.")
+        }
+        return
+    }
+
+    val numGridLines = 4
+    val step = ceil(dataMaxValue.toFloat() / numGridLines).toInt().coerceAtLeast(1)
+    val axisMaxValue = step * numGridLines
+
+    Canvas(modifier = Modifier
+        .fillMaxWidth()
+        .height(250.dp)
+        .padding(16.dp)) {
+        val barWidth = size.width / (skillGapDetails.size * 2)
+        val spaceBetweenBars = barWidth
+        val maxBarHeight = size.height * 0.8f
+
+        val textPaint = Paint().asFrameworkPaint().apply {
+            isAntiAlias = true
+            textSize = 12.sp.toPx()
+            color = android.graphics.Color.BLACK
+        }
+
+        // Draw Y-axis labels and grid lines
+        for (i in 0..numGridLines) {
+            val value = i * step
+            val y = size.height - (i.toFloat() / numGridLines) * maxBarHeight
+
+            drawIntoCanvas {
+                it.nativeCanvas.drawText(
+                    value.toString(),
+                    -10f,
+                    y + 5f,
+                    textPaint
+                )
+            }
+            if (i > 0) {
+                drawLine(
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    color = Color.LightGray,
+                    strokeWidth = 1f
+                )
+            }
+        }
+
+        // Draw bars and X-axis labels
+        skillGapDetails.forEachIndexed { index, detail ->
+            val barHeight = (detail.gap.toFloat() / axisMaxValue) * maxBarHeight
+            val left = (index * (barWidth + spaceBetweenBars)) + spaceBetweenBars / 2
+            val top = size.height - barHeight
+
+            // Draw bar
+            drawRect(
+                color = chartColor,
+                topLeft = Offset(left, top),
+                size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
+            )
+
+            // Draw X-axis label
+            drawIntoCanvas {
+                it.nativeCanvas.drawText(
+                    detail.skill,
+                    left + barWidth / 2 - (textPaint.measureText(detail.skill) / 2),
+                    size.height + 15.sp.toPx(),
+                    textPaint
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SkillGapCard(value: String, label: String, icon: ImageVector, iconColor: Color) {
