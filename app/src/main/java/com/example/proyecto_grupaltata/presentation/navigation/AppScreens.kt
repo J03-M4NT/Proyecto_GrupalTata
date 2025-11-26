@@ -7,6 +7,8 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Login
     object LoginScreen : AppScreens("login_screen")
 
+    // **ARREGLO: Pantalla de Registro que faltaba**
+    object RegisterScreen : AppScreens("register_screen")
 
     // Pantalla Principal (Home)
     object HomeScreen : AppScreens("home_screen")
