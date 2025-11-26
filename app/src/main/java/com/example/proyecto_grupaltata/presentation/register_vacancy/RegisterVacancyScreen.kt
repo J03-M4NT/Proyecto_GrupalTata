@@ -221,7 +221,7 @@ private fun SkillsSelectionDialog(
     initialSelection: List<String>,
     onDismissRequest: (List<String>) -> Unit
 ) {
-    val allSkills = listOf("React", "Angular", "Vue.js", "Node.js", "Python", "Java", "TypeScript", "JavaScript", "MongoDB", "AWS", "Docker", "GIT")
+    val allSkills = listOf("React", "Angular", "Vue.js", "Node.js", "Python", "Java", "TypeScript", "JavaScript", "MongoDB", "AWS", "Docker", "GIT", "UX/UI")
     val selectedSkills = remember { mutableStateListOf<String>().also { it.addAll(initialSelection) } }
 
     Dialog(onDismissRequest = { onDismissRequest(initialSelection) }) {
