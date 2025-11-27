@@ -66,7 +66,7 @@ data class SkillGapDetail(
     val priority: String // "Alta", "Media", "Baja"
 )
 
-data class Collaborator(val name: String, val position: String)
+data class Collaborator(val name: String, val position: String, val percentage: Int)
 
 
 class BrechasViewModel : ViewModel() {
@@ -110,12 +110,13 @@ class BrechasViewModel : ViewModel() {
 
                 for (document in result) {
                     val technicalSkills = document.get("technicalSkills") as? List<Map<String, Any>>
-                    val hasSkill = technicalSkills?.any { it["name"] == skillName } ?: false
+                    val skillMap = technicalSkills?.find { it["name"] == skillName }
 
-                    if (hasSkill) {
+                    if (skillMap != null) {
                         val name = document.getString("nombre") ?: "N/A"
                         val position = document.getString("puesto") ?: "N/A"
-                        collaboratorsList.add(Collaborator(name, position))
+                        val percentage = (skillMap["percentage"] as? Number)?.toInt() ?: 0
+                        collaboratorsList.add(Collaborator(name, position, percentage))
                     }
                 }
                 _collaboratorsForSkill.value = collaboratorsList
@@ -357,6 +358,8 @@ fun UsersWithSkillDialog(
                             Text(text = user.name, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = user.position)
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(text = "${user.percentage}%", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
