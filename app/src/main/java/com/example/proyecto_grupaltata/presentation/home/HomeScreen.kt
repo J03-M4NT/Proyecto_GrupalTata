@@ -1,10 +1,7 @@
 package com.example.proyecto_grupaltata.presentation.home
 
-import androidx.compose.animation.core.copy
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,11 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -36,14 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
-import com.example.proyecto_grupaltata.R
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,24 +46,7 @@ fun HomeScreen(navController: NavController) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // TopBar
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo de Tata Consultancy Services",
-                modifier = Modifier.height(24.dp)
-            )
-
-            // Placeholder para el botón de notificación
-            Text("Lorem Ipsum", style = MaterialTheme.typography.bodyMedium)
-        }
-
-
-        Spacer(modifier = Modifier.height(24.dp))
+        // The TopAppBar is now handled by the main Scaffold in MainActivity
 
         // Texto de Bienvenida
         Text("¡Bienvenido!", style = MaterialTheme.typography.headlineMedium, color = Color.Gray)
@@ -97,15 +71,12 @@ fun HomeScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         RecentActivityList()
-
-
     }
 }
 
 
 @Composable
 fun DashboardGrid() {
-
     val items = listOf(
         InfoCardData("Colaboradores", "127", Icons.Default.People, Color(0xFF4A86E8)),
         InfoCardData("Vacantes Abiertas", "4", Icons.Default.Work, Color(0xFFF57C00)),
@@ -121,16 +92,12 @@ fun DashboardGrid() {
     ) {
         items(items) { item ->
             InfoCard(data = item)
-
         }
     }
-
 }
-
 
 @Composable
 fun InfoCard(data: InfoCardData){
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -148,20 +115,15 @@ fun InfoCard(data: InfoCardData){
                 tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
-
             Spacer(modifier = Modifier.height(8.dp))
             Text(data.value, style = MaterialTheme.typography.headlineMedium, color = Color.White, fontWeight = FontWeight.Bold)
             Text(data.title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
         }
-
     }
-
 }
-
 
 @Composable
 fun RecentActivityList() {
-
     val activities = listOf(
         ActivityItemData("Vacante cubierta internamente", "Senior Developer - 2 candidatos", "Hace 2 horas", Icons.Default.CheckCircle, Color(0xFF388E3C)),
         ActivityItemData("Nuevos skills registrados", "15 colaboradores actualizaron sus perfiles", "Hoy", Icons.Default.People, Color(0xFF4A86E8)),
@@ -197,10 +159,7 @@ fun RecentActivityList() {
             }
         }
     }
-
 }
-
-
 
 data class InfoCardData(val title: String, val value: String, val icon: ImageVector, val color: Color)
 data class ActivityItemData(val title: String, val subtitle: String, val time: String, val icon: ImageVector, val iconColor: Color)
