@@ -2,6 +2,7 @@ package com.example.proyecto_grupaltata.presentation.brechas
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,18 +14,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,6 +66,9 @@ data class SkillGapDetail(
     val priority: String // "Alta", "Media", "Baja"
 )
 
+data class Collaborator(val name: String, val position: String, val percentage: Int)
+
+
 class BrechasViewModel : ViewModel() {
     private val _requiredSkillsCount = MutableStateFlow(0)
     val requiredSkillsCount: StateFlow<Int> = _requiredSkillsCount
@@ -71,12 +79,53 @@ class BrechasViewModel : ViewModel() {
     private val _skillGapDetails = MutableStateFlow<List<SkillGapDetail>>(emptyList())
     val skillGapDetails: StateFlow<List<SkillGapDetail>> = _skillGapDetails
 
+    private val _selectedSkill = MutableStateFlow<SkillGapDetail?>(null)
+    val selectedSkill: StateFlow<SkillGapDetail?> = _selectedSkill
+
+    private val _collaboratorsForSkill = MutableStateFlow<List<Collaborator>>(emptyList())
+    val collaboratorsForSkill: StateFlow<List<Collaborator>> = _collaboratorsForSkill
 
     init {
         fetchRequiredSkillsCount()
         fetchAvailableSkillsCount()
         fetchSkillGapDetails()
     }
+
+    fun onSkillSelected(skillDetail: SkillGapDetail) {
+        _selectedSkill.value = skillDetail
+        fetchCollaboratorsForSkill(skillDetail.skill)
+    }
+
+    fun onDialogDismiss() {
+        _selectedSkill.value = null
+        _collaboratorsForSkill.value = emptyList()
+    }
+
+    private fun fetchCollaboratorsForSkill(skillName: String) {
+        viewModelScope.launch {
+            try {
+                val db = Firebase.firestore
+                val collaboratorsList = mutableListOf<Collaborator>()
+                val result = db.collection("collaborators").get().await()
+
+                for (document in result) {
+                    val technicalSkills = document.get("technicalSkills") as? List<Map<String, Any>>
+                    val skillMap = technicalSkills?.find { it["name"] == skillName }
+
+                    if (skillMap != null) {
+                        val name = document.getString("nombre") ?: "N/A"
+                        val position = document.getString("puesto") ?: "N/A"
+                        val percentage = (skillMap["percentage"] as? Number)?.toInt() ?: 0
+                        collaboratorsList.add(Collaborator(name, position, percentage))
+                    }
+                }
+                _collaboratorsForSkill.value = collaboratorsList
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
+
 
     fun fetchRequiredSkillsCount() {
         viewModelScope.launch {
@@ -176,8 +225,18 @@ fun BrechasScreen(viewModel: BrechasViewModel = viewModel()) {
     val requiredSkillsCount by viewModel.requiredSkillsCount.collectAsState()
     val availableSkillsCount by viewModel.availableSkillsCount.collectAsState()
     val skillGapDetails by viewModel.skillGapDetails.collectAsState()
+    val selectedSkill by viewModel.selectedSkill.collectAsState()
+    val collaboratorsForSkill by viewModel.collaboratorsForSkill.collectAsState()
 
     val gap = (requiredSkillsCount - availableSkillsCount).coerceAtLeast(0)
+
+    selectedSkill?.let { skill ->
+        UsersWithSkillDialog(
+            skillName = skill.skill,
+            users = collaboratorsForSkill,
+            onDismiss = { viewModel.onDialogDismiss() }
+        )
+    }
 
     Scaffold(
     ) { paddingValues ->
@@ -264,7 +323,10 @@ fun BrechasScreen(viewModel: BrechasViewModel = viewModel()) {
                     Text("Calculando detalles...", color = Color.Gray)
                 } else {
                     skillGapDetails.forEach { detail ->
-                        SkillGapDetailCard(detail = detail)
+                        SkillGapDetailCard(
+                            detail = detail,
+                            onClick = { viewModel.onSkillSelected(detail) }
+                        )
                     }
                 }
             }
@@ -272,6 +334,45 @@ fun BrechasScreen(viewModel: BrechasViewModel = viewModel()) {
         }
     }
 }
+
+@Composable
+fun UsersWithSkillDialog(
+    skillName: String,
+    users: List<Collaborator>,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Usuarios con la habilidad: $skillName") },
+        text = {
+            LazyColumn {
+                if (users.isEmpty()) {
+                    item { Text("No se encontraron usuarios con esta habilidad.") }
+                } else {
+                    items(users) { user ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(text = user.name, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = user.position)
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(text = "${user.percentage}%", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cerrar")
+            }
+        }
+    )
+}
+
 
 @Composable
 fun SkillBarChart(skillGapDetails: List<SkillGapDetail>) {
@@ -383,11 +484,12 @@ fun SkillGapCard(value: String, label: String, icon: ImageVector, iconColor: Col
 }
 
 @Composable
-fun SkillGapDetailCard(detail: SkillGapDetail) {
+fun SkillGapDetailCard(detail: SkillGapDetail, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
