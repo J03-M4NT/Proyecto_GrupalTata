@@ -42,20 +42,25 @@ fun LoginScreen(
     val context = LocalContext.current
     val loginState = loginViewModel.loginState.collectAsState().value
 
-    // Observador para manejar el resultado del login
+    // Observador para manejar el resultado del login y otros eventos
     LaunchedEffect(loginState) {
+        // Manejar éxito de login
         loginState.loginSuccess?.let { userId ->
-            // 1. Notificar al MainViewModel sobre el usuario que ha iniciado sesión
             mainViewModel.fetchCollaborator(userId)
-
-            // 2. Navegar a la pantalla principal
             Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
             navController.navigate(AppScreens.HomeScreen.route) {
                 popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
             }
         }
+        // Manejar errores
         loginState.error?.let {
             Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
+            loginViewModel.clearError()
+        }
+        // Manejar mensajes (como el de recuperación de contraseña)
+        loginState.toastMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            loginViewModel.clearToastMessage()
         }
     }
 
@@ -78,7 +83,8 @@ fun LoginScreen(
                 onValueChange = { loginViewModel.onValueChange(it, "email") },
                 label = { Text("Correo electrónico") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -88,9 +94,17 @@ fun LoginScreen(
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // **NUEVO: Botón para recuperar contraseña**
+            TextButton(onClick = { loginViewModel.resetPassword() }) {
+                Text("¿Olvidaste tu contraseña?")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { loginViewModel.loginUser() },

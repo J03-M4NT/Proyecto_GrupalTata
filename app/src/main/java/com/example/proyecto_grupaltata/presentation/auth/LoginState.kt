@@ -5,7 +5,8 @@ package com.example.proyecto_grupaltata.presentation.auth
  */
 data class LoginState(
     val isLoading: Boolean = false,
-    // Guardamos el ID del usuario en caso de éxito para poder usarlo después
     val loginSuccess: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    // **NUEVO: Mensaje para mostrar en un Toast (ej. confirmación de correo enviado)**
+    val toastMessage: String? = null 
 )
