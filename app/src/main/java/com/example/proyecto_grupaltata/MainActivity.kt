@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto_grupaltata.presentation.components.MainTopAppBar
 import com.example.proyecto_grupaltata.presentation.main.MainViewModel
 import com.example.proyecto_grupaltata.presentation.navigation.AppNavGraph
 import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
@@ -41,13 +42,16 @@ fun MainScreen(mainViewModel: MainViewModel) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // **RESTAURACIÓN: Consumir el objeto 'usuario' del ViewModel**
     val usuario by mainViewModel.usuario.collectAsState()
 
     Scaffold(
+        topBar = {
+            if (currentRoute != AppScreens.LoginScreen.route && currentRoute != AppScreens.RegisterScreen.route) {
+                MainTopAppBar(usuario = usuario)
+            }
+        },
         bottomBar = {
             if (currentRoute != AppScreens.LoginScreen.route && currentRoute != AppScreens.RegisterScreen.route) {
-                // **RESTAURACIÓN: Pasar el 'usuario' (que contiene el rol) a la barra de navegación**
                 BottomNavigationBar(navController = navController, usuario = usuario)
             }
         }

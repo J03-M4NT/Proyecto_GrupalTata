@@ -40,10 +40,10 @@ fun RegisterVacancyDialog(
     val context = LocalContext.current
 
     var isLevelExpanded by remember { mutableStateOf(false) }
-    val levelOptions = listOf("Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4", "Nivel 5")
+    val levelOptions = listOf("Junior (0-2 años)", "Semi-Senior (2-4 años)", "Senior (4-7 años)", "Expert (7+ años)", "Líder/Arquitecto")
 
     var isUrgencyExpanded by remember { mutableStateOf(false) }
-    val urgencyOptions = listOf("Baja", "Media", "Alta")
+    val urgencyOptions = listOf("Baja (30+ días)", "Media (15-30 días)", "Alta (< 15 días)", "Crítica (Menos de 7 días)")
 
     val datePickerDialog = DatePickerDialog(
         context,
