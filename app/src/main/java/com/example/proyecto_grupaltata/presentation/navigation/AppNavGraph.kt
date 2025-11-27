@@ -2,50 +2,51 @@ package com.example.proyecto_grupaltata.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.proyecto_grupaltata.presentation.auth.LoginScreen
+import com.example.proyecto_grupaltata.presentation.auth.RegisterScreen
 import com.example.proyecto_grupaltata.presentation.brechas.BrechasScreen
 import com.example.proyecto_grupaltata.presentation.home.HomeScreen
-import com.example.proyecto_grupaltata.presentation.mapping.MappingViewModel
+import com.example.proyecto_grupaltata.presentation.main.MainViewModel
 import com.example.proyecto_grupaltata.presentation.matching.MatchingScreen
 import com.example.proyecto_grupaltata.presentation.more.MoreScreen
+import com.example.proyecto_grupaltata.presentation.profile.EditProfileScreen
+import com.example.proyecto_grupaltata.presentation.profile.ProfileScreen
 import com.example.proyecto_grupaltata.presentation.report_activity.ReportActivityScreen
 import com.example.proyecto_grupaltata.presentation.vacancies.VacanciesScreen
 
 @Composable
-fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
-
-    // Create a single instance of the ViewModel to be shared
-    val mappingViewModel: MappingViewModel = viewModel()
+fun AppNavGraph(navController: NavHostController, modifier: Modifier, mainViewModel: MainViewModel) {
 
     NavHost(
         navController = navController,
-        modifier = modifier,
-        startDestination = AppScreens.LoginScreen.route
+        startDestination = AppScreens.LoginScreen.route,
+        modifier = modifier
     ) {
 
-        composable(AppScreens.LoginScreen.route) { LoginScreen(navController) }
-
+        composable(AppScreens.LoginScreen.route) { LoginScreen(navController, mainViewModel) }
+        composable(AppScreens.RegisterScreen.route) { RegisterScreen(navController) }
         composable(AppScreens.HomeScreen.route) { HomeScreen(navController) }
-
-        composable(AppScreens.VacanciesScreen.route) {
-            // Pass the shared ViewModel to VacanciesScreen
-            VacanciesScreen(navController = navController, mappingViewModel = mappingViewModel)
-        }
-
-        composable(AppScreens.MoreScreen.route) { MoreScreen(navController) }
-
-        composable(AppScreens.MatchingScreen.route) {
-            // Pass the shared ViewModel to MatchingScreen (Mapping)
-            MatchingScreen(navController = navController, mappingViewModel = mappingViewModel)
-        }
-
+        composable(AppScreens.VacanciesScreen.route) { VacanciesScreen(navController) }
+        composable(AppScreens.MatchingScreen.route) { MatchingScreen(navController) }
         composable(AppScreens.BrechasScreen.route) { BrechasScreen() }
-
         composable(AppScreens.ReportActivityScreen.route) { ReportActivityScreen(navController) }
+        composable(AppScreens.ProfileScreen.route) { ProfileScreen(navController) }
+        
+        // **RESTAURACIÓN: Pasar el MainViewModel a MoreScreen**
+        composable(AppScreens.MoreScreen.route) { MoreScreen(navController, mainViewModel) }
 
+        composable(
+            route = AppScreens.EditProfileScreen.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            requireNotNull(userId) { "El ID de usuario no puede ser nulo." }
+            EditProfileScreen(navController = navController, userId = userId)
+        }
     }
 }

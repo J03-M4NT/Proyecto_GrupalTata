@@ -20,41 +20,37 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.proyecto_grupaltata.R
-import com.example.proyecto_grupaltata.presentation.main.MainViewModel
 import com.example.proyecto_grupaltata.presentation.navigation.AppScreens
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     navController: NavController,
-    mainViewModel: MainViewModel,
-    loginViewModel: LoginViewModel = viewModel()
+    registerViewModel: RegisterViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val loginState = loginViewModel.loginState.collectAsState().value
+    val registerState = registerViewModel.registerState.collectAsState()
 
-    // Observador para manejar el resultado del login
-    LaunchedEffect(loginState) {
-        loginState.loginSuccess?.let { userId ->
-            // 1. Notificar al MainViewModel sobre el usuario que ha iniciado sesión
-            mainViewModel.fetchCollaborator(userId)
-
-            // 2. Navegar a la pantalla principal
-            Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-            navController.navigate(AppScreens.HomeScreen.route) {
-                popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+    // Navegar a la pantalla de Login si el registro fue exitoso
+    LaunchedEffect(registerState.value) {
+        if (registerState.value.isSuccess) {
+            Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+            navController.navigate(AppScreens.LoginScreen.route) {
+                popUpTo(navController.graph.id) { inclusive = true }
             }
         }
-        loginState.error?.let {
+        registerState.value.error?.let {
             Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
         }
     }
@@ -67,15 +63,24 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Image(painter = painterResource(id = R.drawable.logo), contentDescription = "Logo")
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Inicio de Sesión", style = MaterialTheme.typography.headlineSmall)
+            Text(text = "Registro de Usuario", style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = loginViewModel.email,
-                onValueChange = { loginViewModel.onValueChange(it, "email") },
+                value = registerViewModel.username,
+                onValueChange = { registerViewModel.onValueChange(it, "username") },
+                label = { Text("Nombre completo") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = registerViewModel.email,
+                onValueChange = { registerViewModel.onValueChange(it, "email") },
                 label = { Text("Correo electrónico") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
@@ -83,8 +88,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = loginViewModel.password,
-                onValueChange = { loginViewModel.onValueChange(it, "password") },
+                value = registerViewModel.password,
+                onValueChange = { registerViewModel.onValueChange(it, "password") },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -93,19 +98,19 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { loginViewModel.loginUser() },
+                onClick = { registerViewModel.registerUser() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Ingresar")
+                Text(text = "Registrarme")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            TextButton(onClick = { navController.navigate(AppScreens.RegisterScreen.route) }) {
-                Text("¿No tienes una cuenta? Regístrate")
+            TextButton(onClick = { navController.popBackStack() }) {
+                Text("¿Ya tienes una cuenta? Inicia Sesión")
             }
         }
 
-        if (loginState.isLoading) {
+        if (registerState.value.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }

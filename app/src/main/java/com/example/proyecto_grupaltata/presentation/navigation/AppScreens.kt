@@ -7,6 +7,8 @@ sealed class AppScreens(val route: String) {
     // Pantalla de Login
     object LoginScreen : AppScreens("login_screen")
 
+    // **ARREGLO: Pantalla de Registro que faltaba**
+    object RegisterScreen : AppScreens("register_screen")
 
     // Pantalla Principal (Home)
     object HomeScreen : AppScreens("home_screen")
@@ -30,5 +32,14 @@ sealed class AppScreens(val route: String) {
     
     // Pantalla de Reportes de Actividad
     object ReportActivityScreen : AppScreens("report_activity_screen")
+
+    // Pantalla de Perfil de Usuario
+    object ProfileScreen : AppScreens("profile_screen")
+
+    // Pantalla para Editar el Perfil de Usuario. Acepta el ID de usuario como argumento.
+    object EditProfileScreen : AppScreens("edit_profile_screen/{userId}") {
+        // Función para construir la ruta completa con el ID de usuario.
+        fun createRoute(userId: String) = "edit_profile_screen/$userId"
+    }
 
 }
